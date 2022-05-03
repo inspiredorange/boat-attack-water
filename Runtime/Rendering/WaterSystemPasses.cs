@@ -79,11 +79,10 @@ namespace WaterSystem.Rendering
             if (cam.cameraType != CameraType.Game && cam.cameraType != CameraType.SceneView) return;
 
             CommandBuffer cmd = CommandBufferPool.Get();
+            //context.ExecuteCommandBuffer(cmd);
+            cmd.Clear();
             using (new ProfilingScope(cmd, m_WaterFX_Profile)) // makes sure we have profiling ability
             {
-                context.ExecuteCommandBuffer(cmd);
-                cmd.Clear();
-
                 // here we choose renderers based off the "WaterFX" shader pass and also sort back to front
                 var drawSettings = CreateDrawingSettings(m_WaterFXShaderTag, ref renderingData,
                     SortingCriteria.CommonTransparent);
@@ -155,10 +154,9 @@ namespace WaterSystem.Rendering
                 MaterialPropertyBlock matBloc = new MaterialPropertyBlock();
                 matBloc.CopySHCoefficientArraysFrom(new[] { probe });
                 cmd.DrawMesh(infiniteMesh, matrix, infiniteMaterial, 0, 0, matBloc);
-
-                context.ExecuteCommandBuffer(cmd);
-                CommandBufferPool.Release(cmd);
             }
+            context.ExecuteCommandBuffer(cmd);
+            CommandBufferPool.Release(cmd);
         }
     }
 

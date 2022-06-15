@@ -22,9 +22,12 @@ namespace WaterSystem
 
         //Details for Buoyant Objects
         private static NativeArray<float3> _positions;
+        private static NativeArray<float3> _dynamicPositions;
         public static int _positionCount;
         private static NativeArray<float3> _wavePos;
+        private static NativeArray<float3> _waveCachedPos;
         private static NativeArray<float3> _waveNormal;
+        private static NativeArray<float3> _waveCachedNormal;
         private static NativeArray<float> _opacity;
         private static NativeArray<float> _waterDepth;
         private static NativeArray<float> _depthProfile;
@@ -33,6 +36,9 @@ namespace WaterSystem
         private static JobHandle _waterHeightHandle;
         public static readonly Dictionary<int, int2> Registry = new Dictionary<int, int2>();
         
+        //Details for cameras
+        private static NativeArray<float3> _camPositions;
+        private static readonly Dictionary<Camera, float3> CamRegistry = new Dictionary<Camera, float3>();
 
         public static void Init()
         {
@@ -47,8 +53,11 @@ namespace WaterSystem
             }
 
             _positions = new NativeArray<float3>(4096, Allocator.Persistent);
+            _dynamicPositions = new NativeArray<float3>(4096, Allocator.Persistent);
             _wavePos = new NativeArray<float3>(4096, Allocator.Persistent);
+            _waveCachedPos = new NativeArray<float3>(4096, Allocator.Persistent);
             _waveNormal = new NativeArray<float3>(4096, Allocator.Persistent);
+            _waveCachedNormal = new NativeArray<float3>(4096, Allocator.Persistent);
             _opacity = new NativeArray<float>(4096, Allocator.Persistent);
             _waterDepth = new NativeArray<float>(4096, Allocator.Persistent);
 
@@ -73,8 +82,11 @@ namespace WaterSystem
             //Cleanup native arrays
             _waveData.Dispose();
             _positions.Dispose();
+            _dynamicPositions.Dispose();
             _wavePos.Dispose();
+            _waveCachedPos.Dispose();
             _waveNormal.Dispose();
+            _waveCachedNormal.Dispose();
             _opacity.Dispose();
             _waterDepth.Dispose();
             _depthProfile.Dispose();
@@ -83,15 +95,13 @@ namespace WaterSystem
 
         public static void UpdateSamplePoints(ref NativeArray<float3> samplePoints, int guid)
         {
-            CompleteJobs();
-            
             if (Registry.TryGetValue(guid, out var offsets))
             {
-                for (var i = offsets.x; i < offsets.y; i++) _positions[i] = samplePoints[i - offsets.x];
+                for (var i = offsets.x; i < offsets.y; i++) _dynamicPositions[i] = samplePoints[i - offsets.x];
             }
             else
             {
-                if (_positionCount + samplePoints.Length >= _positions.Length) return;
+                if (_positionCount + samplePoints.Length >= _dynamicPositions.Length) return;
                 
                 offsets = new int2(_positionCount, _positionCount + samplePoints.Length);
                 Registry.Add(guid, offsets);
@@ -125,20 +135,22 @@ namespace WaterSystem
         {
             if (!Registry.TryGetValue(guid, out var offsets)) return;
             
-            _wavePos.Slice(offsets.x, offsets.y - offsets.x).CopyTo(outPos);
+            _waveCachedPos.Slice(offsets.x, offsets.y - offsets.x).CopyTo(outPos);
         }
 
         public static void GetData(int guid, ref float3[] outPos, ref float3[] outNorm)
         {
             if (!Registry.TryGetValue(guid, out var offsets)) return;
             
-            _wavePos.Slice(offsets.x, offsets.y - offsets.x).CopyTo(outPos);
-            _waveNormal.Slice(offsets.x, offsets.y - offsets.x).CopyTo(outNorm);
+            _waveCachedPos.Slice(offsets.x, offsets.y - offsets.x).CopyTo(outPos);
+            _waveCachedNormal.Slice(offsets.x, offsets.y - offsets.x).CopyTo(outNorm);
         }
 
         // Height jobs for the next frame
         public static void UpdateHeights()
         {
+            CompleteJobs();
+            
             if (_processing) return;
             
             _processing = true;
@@ -196,6 +208,11 @@ namespace WaterSystem
             if (_firstFrame || !_processing) return;
             
             _waterHeightHandle.Complete();
+            
+            _waveCachedPos.CopyFrom(_wavePos);
+            _waveCachedNormal.CopyFrom(_waveNormal);
+            _positions.CopyFrom(_dynamicPositions);
+            
             _processing = false;
         }
 
@@ -272,7 +289,7 @@ namespace WaterSystem
                         1 - (qi * wa * sinCalc));
                     waveNorm += (norm * waveCountMulti) * amplitude;
                 }
-                wavePos *= Opacity[i];
+                wavePos *= math.saturate(Opacity[i]);
                 wavePos.xz += Position[i].xz;
                 wavePos.y += WaveLevelOffset;
                 OutPosition[i] = wavePos;

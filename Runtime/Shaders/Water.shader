@@ -21,17 +21,14 @@
 			/////////////////SHADER FEATURES//////////////////
 			#pragma multi_compile_fragment _REFLECTION_CUBEMAP _REFLECTION_PROBES _REFLECTION_PLANARREFLECTION _REFLECTION_SSR
 			#pragma multi_compile _ USE_STRUCTURED_BUFFER
-			#pragma multi_compile _ _STATIC_SHADER
-			#pragma multi_compile _ _BOATATTACK_WATER_DEBUG
+			#pragma shader_feature_local _STATIC_SHADER
+			#pragma multi_compile _ DEBUG_DISPLAY
 
 			#pragma multi_compile_fragment _SSR_SAMPLES_LOW _SSR_SAMPLES_MEDIUM _SSR_SAMPLES_HIGH 
 
 			// -------------------------------------
             // Universal Pipeline keywords/
 			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
-			//#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-            //#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-			
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING

@@ -160,7 +160,7 @@ void RayMarch(float3 origin, float3 direction, out half2 sampleUV, out half vali
 half3 CubemapReflection(float3 viewDirectionWS, float3 positionWS, float3 normalWS)
 {
     float3 reflectVector = reflect(-viewDirectionWS, normalWS);
-    return SAMPLE_TEXTURECUBE_LOD(_CubemapTexture, sampler_CubemapTexture, reflectVector, 0).rgb;
+    //return SAMPLE_TEXTURECUBE_LOD(_CubemapTexture, sampler_CubemapTexture, reflectVector, 0).rgb;
     return GlossyEnvironmentReflection(reflectVector, 0, 1);
 }
 

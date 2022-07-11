@@ -15,10 +15,19 @@
 #endif
 
 #define DEPTH_MULTIPLIER 1 / _MaxDepth
+
+#if UNITY_UV_STARTS_AT_TOP
 #define WaterBufferA(uv) SAMPLE_TEXTURE2D(_WaterBufferA, sampler_ScreenTextures_linear_clamp, half2(uv.x, 1-uv.y))
 #define WaterBufferAVert(uv) SAMPLE_TEXTURE2D_LOD(_WaterBufferA, sampler_ScreenTextures_linear_clamp, half2(uv.x, 1-uv.y), 0)
 #define WaterBufferB(uv) SAMPLE_TEXTURE2D(_WaterBufferB, sampler_ScreenTextures_linear_clamp, half2(uv.x, 1-uv.y))
 #define WaterBufferBVert(uv) SAMPLE_TEXTURE2D_LOD(_WaterBufferB, sampler_ScreenTextures_linear_clamp, half2(uv.x, 1-uv.y), 0)
+#else
+#define WaterBufferA(uv) SAMPLE_TEXTURE2D(_WaterBufferA, sampler_ScreenTextures_linear_clamp, uv)
+#define WaterBufferAVert(uv) SAMPLE_TEXTURE2D_LOD(_WaterBufferA, sampler_ScreenTextures_linear_clamp, uv, 0)
+#define WaterBufferB(uv) SAMPLE_TEXTURE2D(_WaterBufferB, sampler_ScreenTextures_linear_clamp, uv)
+#define WaterBufferBVert(uv) SAMPLE_TEXTURE2D_LOD(_WaterBufferB, sampler_ScreenTextures_linear_clamp, uv, 0)
+#endif
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //          	   	       Water debug functions                             //
@@ -341,7 +350,7 @@ float3 WaterShading(WaterInputData input, WaterSurfaceData surfaceData, float4 a
 	half2 b = frac(input.detailUV.zw);// * 1-input.detailUV.z;
 		
 	// Debug block
-	#if defined(_BOATATTACK_WATER_DEBUG)
+	#if defined(DEBUG_DISPLAY)
 	[branch] switch(_BoatAttack_Water_DebugPass)
 	{
 		case 0: // none

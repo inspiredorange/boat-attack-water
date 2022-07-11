@@ -4,7 +4,6 @@
 	{
 		_Size ("size", float) = 3.0
 		[Toggle(_STATIC_SHADER)] _Static ("Static", Float) = 0
-		[KeywordEnum(Off, SSS, Refraction, Reflection, Normal, Fresnel, WaterEffects, Foam, WaterDepth)] _Debug ("Debug mode", Float) = 0
 	}
 	SubShader
 	{
@@ -21,17 +20,16 @@
 			#pragma prefer_hlslcc gles
 			/////////////////SHADER FEATURES//////////////////
 			#pragma multi_compile_fragment _REFLECTION_CUBEMAP _REFLECTION_PROBES _REFLECTION_PLANARREFLECTION _REFLECTION_SSR
-			#pragma multi_compile _ _STATIC_SHADER
-			#pragma multi_compile_fragment _ _BOATATTACK_WATER_DEBUG
+			#pragma shader_feature_local _STATIC_SHADER
+			#pragma multi_compile_fragment _ DEBUG_DISPLAY
 
 			#pragma multi_compile_fragment _SSR_SAMPLES_LOW _SSR_SAMPLES_MEDIUM _SSR_SAMPLES_HIGH 
 			
             // -------------------------------------
             // Lightweight Pipeline keywords
-            #pragma multi_compile_fragment _ _MAIN_LIGHT_SHADOWS
-            #pragma multi_compile_fragment _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile_fragment _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            //#pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
 			#pragma multi_compile_fragment _ _LIGHT_COOKIES
             #pragma multi_compile_fragment _ _SHADOWS_SOFT
 

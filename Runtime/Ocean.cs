@@ -207,11 +207,11 @@ namespace WaterSystem
 
             if (shadingDebug != DebugShading.none)
             {
-                Shader.EnableKeyword("_BOATATTACK_WATER_DEBUG");
+                Shader.EnableKeyword("DEBUG_DISPLAY");
             }
             else
             {
-                Shader.DisableKeyword("_BOATATTACK_WATER_DEBUG");
+                Shader.DisableKeyword("DEBUG_DISPLAY");
             }
             Shader.SetGlobalInt(BoatAttackWaterDebugPass, (int)shadingDebug);
             

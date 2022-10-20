@@ -111,12 +111,13 @@ namespace WaterSystem.Rendering
     public class InfiniteWaterPass : ScriptableRenderPass
     {
         private Mesh infiniteMesh;
+        private Shader infiniteShader;
         private Material infiniteMaterial;
 
-        public InfiniteWaterPass(Mesh mesh)
+        public InfiniteWaterPass(Mesh mesh, Shader shader)
         {
-            if (mesh)
-                infiniteMesh = mesh;
+            if (mesh) infiniteMesh = mesh;
+            if (shader) infiniteShader = shader;
             renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
         }
 
@@ -134,8 +135,11 @@ namespace WaterSystem.Rendering
                 return;
             }
 
-            if (infiniteMaterial == null)
-                infiniteMaterial = CoreUtils.CreateEngineMaterial("Boat Attack/Water/InfiniteWater");
+            if (infiniteShader)
+            {
+                if(infiniteMaterial == null)
+                    infiniteMaterial = new Material(infiniteShader);
+            }
 
             if (!infiniteMaterial || !infiniteMesh) return;
 

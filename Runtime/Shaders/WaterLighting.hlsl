@@ -124,6 +124,8 @@ void RayMarch(float3 origin, float3 direction, out half2 sampleUV, out half vali
     sampleUV = 0;
     valid = 0;
     debug = 0;
+
+    float3 baseOrigin = origin;
     
     direction *= SSR_STEP_SIZE;
     const int rcpStepCount = rcp(SSR_ITERATIONS);
@@ -135,7 +137,7 @@ void RayMarch(float3 origin, float3 direction, out half2 sampleUV, out half vali
         //if(valid == 0)
         {
             origin += direction;
-            direction *= 1.25;
+            direction *= 2;
             sampleUV = ViewSpacePosToUV(origin);
 
             //sampleUV.x = sampleUV.x % 2.0;
@@ -160,7 +162,6 @@ void RayMarch(float3 origin, float3 direction, out half2 sampleUV, out half vali
 half3 CubemapReflection(float3 viewDirectionWS, float3 positionWS, float3 normalWS)
 {
     float3 reflectVector = reflect(-viewDirectionWS, normalWS);
-    //return SAMPLE_TEXTURECUBE_LOD(_CubemapTexture, sampler_CubemapTexture, reflectVector, 0).rgb;
     return GlossyEnvironmentReflection(reflectVector, 0, 1);
 }
 
@@ -187,7 +188,7 @@ half3 SampleReflections(float3 normalWS, float3 positionWS, float3 viewDirection
     reflection += SAMPLE_TEXTURE2D(_PlanarReflectionTexture, sampler_ScreenTextures_linear_clamp, reflectionUV).rgb;//planar reflection
 #elif _REFLECTION_SSR
     float2 uv = float2(0, 0);
-    float valid = 1;
+    half valid = 1;
 
     float3 positionVS = TransformWorldToView(positionWS);
     float3 normalVS = TransformWorldToViewDir(normalWS);

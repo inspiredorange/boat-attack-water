@@ -108,7 +108,8 @@ namespace WaterSystem
             Init();
         }
 
-        private void OnDisable() {
+        private void OnDisable() 
+        {
             Cleanup();
         }
 
@@ -127,10 +128,10 @@ namespace WaterSystem
 
         private void BeginCameraRendering(ScriptableRenderContext src, Camera cam)
         {
-            if (cam.cameraType == CameraType.Preview || _instance == null && _instance != this) return;
+            if (cam.cameraType == CameraType.Preview || _instance == null) return;
 
             if (settingsData.refType == Data.ReflectionType.PlanarReflection)
-                PlanarReflections.Execute(src, cam, transform);
+                PlanarReflections.Execute(src, cam, _instance.transform);
 
             if (_causticMaterial == null)
             {
@@ -138,7 +139,7 @@ namespace WaterSystem
                 _causticMaterial.SetTexture("_CausticMap", resources.defaultSurfaceMap);
             }
 
-            _infiniteWaterPass ??= new InfiniteWaterPass(resources.defaultInfinitewWaterMesh);
+            _infiniteWaterPass ??= new InfiniteWaterPass(resources.defaultInfinitewWaterMesh, resources.infiniteWaterShader);
             _waterBufferPass ??= new WaterFxPass();
             _causticsPass ??= new WaterCausticsPass(_causticMaterial);
 
@@ -158,7 +159,7 @@ namespace WaterSystem
             const float yOffset = -0.25f;
 
             var newPos = cam.transform.TransformPoint(Vector3.forward * forwards);
-            newPos.y = yOffset + transform.position.y;
+            newPos.y = yOffset + _instance.transform.position.y;
             newPos.x = quantizeValue * (int) (newPos.x / quantizeValue);
             newPos.z = quantizeValue * (int) (newPos.z / quantizeValue);
 
@@ -205,15 +206,7 @@ namespace WaterSystem
                 resources = Resources.Load("WaterResources") as WaterResources;
             }
 
-            if (shadingDebug != DebugShading.none)
-            {
-                Shader.EnableKeyword("DEBUG_DISPLAY");
-            }
-            else
-            {
-                Shader.DisableKeyword("DEBUG_DISPLAY");
-            }
-            Shader.SetGlobalInt(BoatAttackWaterDebugPass, (int)shadingDebug);
+            SetDebugMode(shadingDebug);
             
             //CPU side
             if(GerstnerWavesJobs.Initialized == false)
@@ -223,6 +216,19 @@ namespace WaterSystem
         private void LateUpdate()
         {
             GerstnerWavesJobs.UpdateHeights();
+        }
+
+        public static void SetDebugMode(DebugShading mode)
+        {
+            if (mode != DebugShading.none)
+            {
+                Shader.EnableKeyword("BOAT_ATTACK_WATER_DEBUG_DISPLAY");
+                Shader.SetGlobalInt(BoatAttackWaterDebugPass, (int)mode);
+            }
+            else
+            {
+                Shader.DisableKeyword("BOAT_ATTACK_WATER_DEBUG_DISPLAY");
+            }
         }
 
         public void FragWaveNormals(bool toggle)

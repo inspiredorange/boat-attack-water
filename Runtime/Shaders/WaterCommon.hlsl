@@ -321,7 +321,7 @@ float3 WaterShading(WaterInputData input, WaterSurfaceData surfaceData, float4 a
 	
     BRDFData brdfData;
     half alpha = 1;
-    InitializeBRDFData(half3(0, 0, 0), 0, half3(1, 1, 1), 0.95 - fresnelTerm * 0.6, alpha, brdfData);
+    InitializeBRDFData(half3(0, 0, 0), 0, half3(1, 1, 1), 0.98, alpha, brdfData);
 	half3 spec = DirectBDRF(brdfData, input.normalWS, mainLight.direction, input.viewDirectionWS);
 	spec *= mainLight.color * mainLight.shadowAttenuation;
 	spec *= 1 - saturate(surfaceData.foamMask * 10);
@@ -350,7 +350,7 @@ float3 WaterShading(WaterInputData input, WaterSurfaceData surfaceData, float4 a
 	half2 b = frac(input.detailUV.zw);// * 1-input.detailUV.z;
 		
 	// Debug block
-	#if defined(DEBUG_DISPLAY)
+	#if defined(BOAT_ATTACK_WATER_DEBUG_DISPLAY)
 	[branch] switch(_BoatAttack_Water_DebugPass)
 	{
 		case 0: // none

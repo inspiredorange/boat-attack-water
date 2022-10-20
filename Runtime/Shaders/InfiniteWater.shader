@@ -21,7 +21,7 @@
 			/////////////////SHADER FEATURES//////////////////
 			#pragma multi_compile_fragment _REFLECTION_CUBEMAP _REFLECTION_PROBES _REFLECTION_PLANARREFLECTION _REFLECTION_SSR
 			#pragma shader_feature_local _STATIC_SHADER
-			#pragma multi_compile_fragment _ DEBUG_DISPLAY
+			#pragma multi_compile_fragment _ BOAT_ATTACK_WATER_DEBUG_DISPLAY
 
 			#pragma multi_compile_fragment _SSR_SAMPLES_LOW _SSR_SAMPLES_MEDIUM _SSR_SAMPLES_HIGH 
 			
@@ -96,7 +96,7 @@
                 i.normalWS = half3(0.0, 1.0, 0.0);
                 i.viewDirectionWS = normalize(GetCameraPositionWS() - i.positionWS).xyzz;
                 i.additionalData = additionalData;
-                i.uv = DetailUVs(i.positionWS, 1);
+                i.uv = DetailUVs(i.positionWS * 0.2, 1);
             	i.preWaveSP = screenUV.xyy;
 
                 WaterInputData inputData;

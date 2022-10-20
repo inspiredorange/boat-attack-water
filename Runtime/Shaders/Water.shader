@@ -22,7 +22,7 @@
 			#pragma multi_compile_fragment _REFLECTION_CUBEMAP _REFLECTION_PROBES _REFLECTION_PLANARREFLECTION _REFLECTION_SSR
 			#pragma multi_compile _ USE_STRUCTURED_BUFFER
 			#pragma shader_feature_local _STATIC_SHADER
-			#pragma multi_compile _ DEBUG_DISPLAY
+			#pragma multi_compile _ BOAT_ATTACK_WATER_DEBUG_DISPLAY
 
 			#pragma multi_compile_fragment _SSR_SAMPLES_LOW _SSR_SAMPLES_MEDIUM _SSR_SAMPLES_HIGH 
 

@@ -8,7 +8,7 @@ using UnityEngine.Experimental.Rendering;
 
 namespace WaterSystem.Rendering
 {
-    public class PlanarReflections
+    public class PlanarReflections : MonoBehaviour
     {
         [Serializable]
         public enum ResolutionModes
